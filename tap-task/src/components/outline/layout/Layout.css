@@ -1,0 +1,7 @@
+/* Layout container */
+.container {
+  position: relative;
+  display: flex;
+  height: calc(100vh - 64px); /* Subtract the header height */
+  margin-top: 64px; /* Push content down to account for the fixed header */
+}

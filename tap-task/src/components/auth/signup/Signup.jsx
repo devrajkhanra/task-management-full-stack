@@ -1,33 +1,65 @@
 import React from "react";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { register } from "../../../store/slices/authSlice";
+import { toast } from "react-toastify";
+import AuthHero from "../../reusable/authHero/AuthHero";
 import "./Signup.css";
 
-const SignupPage = () => {
+// Validation schema using Yup
+const validationSchema = Yup.object().shape({
+  firstName: Yup.string()
+    .required("First Name is required")
+    .min(2, "First Name must be at least 2 characters"),
+  lastName: Yup.string()
+    .required("Last Name is required")
+    .min(2, "Last Name must be at least 2 characters"),
+  email: Yup.string()
+    .email("Invalid email address")
+    .required("Email is required"),
+  password: Yup.string()
+    .min(6, "Password must be at least 6 characters")
+    .required("Password is required"),
+  confirmPassword: Yup.string().oneOf(
+    [Yup.ref("password"), null],
+    "Passwords must match"
+  ),
+  rememberMe: Yup.boolean(),
+});
+
+const Signup = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  // Initial form values
+  const initialValues = {
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    rememberMe: false,
+  };
+
+  // Handle form sumission
+  const onSubmit = async (values, { setSubmitting, setErrors }) => {
+    try {
+      const resultAction = await dispatch(register(values)).unwrap();
+      toast.success("Signup successful!");
+      navigate("/login");
+    } catch (error) {
+      toast.error(error || "Signup failed");
+      setErrors({ general: "Signup failed" });
+    } finally {
+      setSubmitting(false);
+    }
+  };
   return (
     <div className="signup-container">
       {/* Left side - Hero section */}
-      <div className="hero-section">
-        <div className="hero-content">
-          <div className="play-button">
-            <svg className="play-icon" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" />
-            </svg>
-          </div>
-          <h1 className="hero-title">
-            Digital
-            <br />
-            platform
-            <br />
-            for task
-            <br />
-            <span className="hero-title-dark">management.</span>
-          </h1>
-          <p className="hero-subtitle">
-            You will never miss upcoming tasks.
-            <br />
-            But you will stay ahead in planning.
-          </p>
-        </div>
-      </div>
+      <AuthHero />
 
       {/* Right side - Signup form */}
       <div className="signup-form-container">
@@ -54,108 +86,127 @@ const SignupPage = () => {
             </p>
           </div>
 
-          <form className="signup-form">
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="firstName" className="form-label">
-                  First Name
-                </label>
-                <input
-                  id="firstName"
-                  name="firstName"
-                  type="text"
-                  autoComplete="given-name"
-                  required
-                  className="form-input"
-                />
-              </div>
+          {/* Formik Form */}
+          <Formik
+            initialValues={initialValues}
+            validationSchema={validationSchema}
+            onSubmit={onSubmit}
+          >
+            {({ isSubmitting, errors }) => (
+              <Form className="signup-form">
+                {errors.general && (
+                  <div className="error general-error">{errors.general}</div>
+                )}
 
-              <div className="form-group">
-                <label htmlFor="lastName" className="form-label">
-                  Last Name
-                </label>
-                <input
-                  id="lastName"
-                  name="lastName"
-                  type="text"
-                  autoComplete="family-name"
-                  required
-                  className="form-input"
-                />
-              </div>
-            </div>
+                <div className="form-row">
+                  <div className="form-group">
+                    <label htmlFor="firstName" className="form-label">
+                      First Name
+                    </label>
+                    <Field
+                      id="firstName"
+                      name="firstName"
+                      type="text"
+                      autoComplete="given-name"
+                      required
+                      className="form-input"
+                    />
+                    <ErrorMessage
+                      name="firstName"
+                      component="div"
+                      className="error"
+                    />
+                  </div>
 
-            <div className="form-group">
-              <label htmlFor="email" className="form-label">
-                Email
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                className="form-input"
-              />
-            </div>
+                  <div className="form-group">
+                    <label htmlFor="lastName" className="form-label">
+                      Last Name
+                    </label>
+                    <Field
+                      id="lastName"
+                      name="lastName"
+                      type="text"
+                      autoComplete="family-name"
+                      required
+                      className="form-input"
+                    />
+                    <ErrorMessage
+                      name="lastName"
+                      component="div"
+                      className="error"
+                    />
+                  </div>
+                </div>
 
-            <div className="form-group">
-              <label htmlFor="password" className="form-label">
-                Password
-              </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="new-password"
-                required
-                className="form-input"
-              />
-              <p className="password-hint">
-                Password must be at least 8 characters long
-              </p>
-            </div>
+                <div className="form-group">
+                  <label htmlFor="email" className="form-label">
+                    Email
+                  </label>
+                  <Field
+                    id="email"
+                    name="email"
+                    type="email"
+                    autoComplete="email"
+                    required
+                    className="form-input"
+                  />
+                  <ErrorMessage
+                    name="email"
+                    component="div"
+                    className="error"
+                  />
+                </div>
 
-            <div className="form-group">
-              <label htmlFor="confirmPassword" className="form-label">
-                Confirm Password
-              </label>
-              <input
-                id="confirmPassword"
-                name="confirmPassword"
-                type="password"
-                autoComplete="new-password"
-                required
-                className="form-input"
-              />
-            </div>
+                <div className="form-group">
+                  <label htmlFor="password" className="form-label">
+                    Password
+                  </label>
+                  <Field
+                    id="password"
+                    name="password"
+                    type="password"
+                    autoComplete="new-password"
+                    required
+                    className="form-input"
+                  />
+                  <ErrorMessage
+                    name="password"
+                    component="div"
+                    className="error"
+                  />
+                </div>
 
-            <div className="form-group checkbox-group">
-              <input
-                id="terms"
-                name="terms"
-                type="checkbox"
-                required
-                className="checkbox-input"
-              />
-              <label htmlFor="terms" className="checkbox-label">
-                I agree to the{" "}
-                <a href="#" className="terms-link">
-                  Terms of Service
-                </a>{" "}
-                and{" "}
-                <a href="#" className="terms-link">
-                  Privacy Policy
-                </a>
-              </label>
-            </div>
+                <div className="form-group">
+                  <label htmlFor="confirmPassword" className="form-label">
+                    Confirm Password
+                  </label>
+                  <Field
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    type="password"
+                    autoComplete="new-password"
+                    required
+                    className="form-input"
+                  />
+                  <ErrorMessage
+                    name="confirmPassword"
+                    component="div"
+                    className="error"
+                  />
+                </div>
 
-            <div className="form-group">
-              <button type="submit" className="signup-button">
-                Create Account
-              </button>
-            </div>
-          </form>
+                <div className="form-group">
+                  <button
+                    type="submit"
+                    className="signup-button"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? "Registering account..." : "Create Account"}
+                  </button>
+                </div>
+              </Form>
+            )}
+          </Formik>
 
           <div className="separator">
             <div className="separator-line"></div>
@@ -189,4 +240,4 @@ const SignupPage = () => {
   );
 };
 
-export default SignupPage;
+export default Signup;

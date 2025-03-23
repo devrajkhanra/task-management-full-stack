@@ -2,6 +2,8 @@ import React from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { login } from "../../../store/slices/authSlice";
 import { toast } from "react-toastify";
 import AuthHero from "../../reusable/authHero/AuthHero";
 import "./Login.css";
@@ -19,6 +21,7 @@ const validationSchema = Yup.object().shape({
 
 const Login = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   // Initial form values
   const initialValues = {
@@ -30,43 +33,12 @@ const Login = () => {
   // Handle form submission
   const onSubmit = async (values, { setSubmitting, setErrors }) => {
     try {
-      // Call the login API
-      const response = await fetch("http://localhost:3000/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: values.email,
-          password: values.password,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        // Success - store the token in localStorage
-        localStorage.setItem("token", data.token);
-        if (values.rememberMe) {
-          localStorage.setItem("userId", data.userId);
-        } else {
-          sessionStorage.setItem("userId", data.userId);
-        }
-
-        // Show success toast
-        toast.success("Login successful!");
-
-        // Redirect to home page
-        navigate("/");
-      } else {
-        // Error handling
-        toast.error(data.message || "Invalid email or password");
-        setErrors({ general: "Login failed" });
-      }
+      const resultAction = await dispatch(login(values)).unwrap();
+      toast.success("Login successful!");
+      navigate("/");
     } catch (error) {
-      console.error("Login error:", error);
-      toast.error("Something went wrong. Please try again.");
-      setErrors({ general: "An unexpected error occurred" });
+      toast.error(error || "Login failed");
+      setErrors({ general: "Login failed" });
     } finally {
       setSubmitting(false);
     }

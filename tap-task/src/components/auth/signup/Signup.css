@@ -172,6 +172,7 @@ a {
 .checkbox-group {
   display: flex;
   align-items: flex-start;
+  background-color: aquamarine;
 }
 
 .checkbox-input {

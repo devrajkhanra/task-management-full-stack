@@ -1,15 +1,4 @@
 /* Sidebar styles */
-.sidebar {
-  background-color: #ffffff;
-  min-width: 280px;
-  width: 280px;
-  height: 100vh;
-  padding: 0;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
-  display: flex;
-  flex-direction: column;
-  border-right: 1px solid #f0f0f0;
-}
 
 .sidebar-section {
   padding: 16px 20px;

@@ -1,4 +1,3 @@
-import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faUsers,
@@ -9,6 +8,7 @@ import {
   faSpinner,
   faExclamationTriangle,
 } from "@fortawesome/free-solid-svg-icons";
+
 import "./Overview.css"; // You can create a separate CSS file for Overview if needed
 
 const Overview = () => {

@@ -1,5 +1,5 @@
 const User = require("../models/User");
-const generateTokenAndSetCookie = require("../utils/generateToken");
+const generateTokenAndSetCookie = require("../../utils/generateToken");
 const asyncHandler = require("express-async-handler");
 
 const registerUser = asyncHandler(async (req, res) => {
@@ -15,7 +15,6 @@ const registerUser = asyncHandler(async (req, res) => {
   // Create user
   const user = await User.create({ firstName, lastName, email, password });
   if (user) {
-    generateTokenAndSetCookie(user._id, res);
     res.status(201).json({
       _id: user._id,
       firstName: user.firstName,
@@ -35,6 +34,7 @@ const loginUser = asyncHandler(async (req, res) => {
 
   if (user && (await user.comparePassword(password))) {
     generateTokenAndSetCookie(user._id, res);
+    console.log(user._id);
     res.json({
       _id: user._id,
       firstName: user.firstName,

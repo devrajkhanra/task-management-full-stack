@@ -185,6 +185,7 @@ a {
 }
 
 .forgot-password-link:hover {
+  cursor: pointer;
   color: #2563eb;
 }
 
@@ -222,6 +223,12 @@ a {
   padding: 0 16px;
   color: #6b7280;
   font-size: 14px;
+}
+
+.link-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 /* Social login */
